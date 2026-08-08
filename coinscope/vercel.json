@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/scan.html",
+      "destination": "/api/scan"
+    }
+  ]
+}
