@@ -1044,10 +1044,6 @@
         btn.setAttribute('aria-disabled', 'true');
         return false;
       }
-
-      // Strip a leading "javascript:" (case-insensitive) so we never end up
-      // with "javascript:javascript:..." when the pasted snippet already
-      // includes the scheme prefix.
       var code = js.trim().replace(/^javascript:/i, '');
 
       // NOTE: do NOT encodeURIComponent this. javascript: hrefs are handed to
@@ -1056,6 +1052,14 @@
       // sequences and break execution with "Unexpected token '%'" errors.
       warning.style.display = 'none';
       btn.setAttribute('href', 'javascript:' + code);
+      //debug
+      console.log("RADAR original:", code.length);
+      console.log("href attribute:", btn.getAttribute('href').length);
+      console.log("href property:", btn.href.length);
+
+      console.log("Original \\x:", (code.match(/\\x/g) || []).length);
+      console.log("Attribute \\x:", (btn.getAttribute('href').match(/\\x/g) || []).length);
+      console.log("Attribute %:", (btn.getAttribute('href').match(/%/g) || []).length);
       return true;
     }
 
