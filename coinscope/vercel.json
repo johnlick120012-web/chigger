@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/dexscreener/:ca",
+      "destination": "/api/dexscreener/:ca"
+    }
+  ]
+}
