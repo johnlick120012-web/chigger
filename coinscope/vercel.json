@@ -7,6 +7,10 @@
     {
       "source": "/rugcheck/tokens/:ca/report",
       "destination": "/api/rugcheck/tokens/:ca/report"
+    },
+    {
+      "source": "/collect",
+      "destination": "/api/collect"
     }
   ]
 }
