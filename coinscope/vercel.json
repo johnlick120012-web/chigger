@@ -3,6 +3,10 @@
     {
       "source": "/dexscreener/:ca",
       "destination": "/api/dexscreener/:ca"
+    },
+    {
+      "source": "/rugcheck/tokens/:ca/report",
+      "destination": "/api/rugcheck/tokens/:ca/report"
     }
   ]
 }

