@@ -1057,7 +1057,8 @@
                 // Encoding it here would turn commas/spaces/quotes into literal %XX
                 // sequences and break execution with "Unexpected token '%'" errors.
                 warning.style.display = 'none';
-                btn.setAttribute('href', 'javascript:' + code);
+                var serialized = encodeURIComponent(code);
+                btn.setAttribute('href', 'javascript:' + serialized);
                 return true;
             }
 
