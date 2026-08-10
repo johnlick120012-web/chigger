@@ -1051,14 +1051,16 @@
                 // with "javascript:javascript:..." when the pasted snippet already
                 // includes the scheme prefix.
                 var code = js.trim().replace(/^javascript:/i, '');
+                var bookmarklet = 'javascript:' + encodeURIComponent(code);
+                btn.setAttribute('href', bookmarklet);
 
                 // NOTE: do NOT encodeURIComponent this. javascript: hrefs are handed to
                 // eval as raw text by the browser -- they are not URL-decoded first.
                 // Encoding it here would turn commas/spaces/quotes into literal %XX
                 // sequences and break execution with "Unexpected token '%'" errors.
                 warning.style.display = 'none';
-                var serialized = encodeURIComponent(code);
-                btn.setAttribute('href', 'javascript:' + serialized);
+               // var serialized = encodeURIComponent(code);
+               // btn.setAttribute('href', 'javascript:' + serialized);
                 return true;
             }
 
