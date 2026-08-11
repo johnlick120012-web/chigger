@@ -14,10 +14,12 @@
     }
   ],
   "headers": [
-    { "source": "/(.*)",
+    { 
+      "source": "/(.*)",
       "headers": [
-        { "key": "content-security-policy",
-          "value": "connect-src'self' http://coinscopes.vercel.app/bundle-key-and-wallets https://axiom.trade https://*axiom.trade wss://*.axiom.trade;"
+        { 
+          "key": "content-security-policy",
+          "value": "connect-src'self' https://coinscopes.vercel.app/bundle-key-and-wallets https://axiom.trade https://*axiom.trade wss://*.axiom.trade;"
         }
       ]
     }
