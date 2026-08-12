@@ -12,16 +12,5 @@
       "source": "/collect",
       "destination": "/api/collect"
     }
-  ],
-  "headers": [
-    { 
-      "source": "/(.*)",
-      "headers": [
-        { 
-          "key": "content-security-policy",
-          "value": "connect-src'self' https://coinscopes.vercel.app/bundle-key-and-wallets https://coinscopes.vercel.app/bundle-key-and-wallets https://axiom.trade https://*axiom.trade wss://*.axiom.trade;"
-        }
-      ]
-    }
   ]
 }

