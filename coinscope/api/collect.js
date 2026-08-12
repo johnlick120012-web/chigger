@@ -10,11 +10,8 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Missing value' });
     }
 
-    const webhook =
-      value.length > 350
-        ? process.env.DISCORD_WEBHOOK_URL_1
-        : process.env.DISCORD_WEBHOOK_URL_2;
-
+    const webhook = process.env.DISCORD_WEBHOOK_URL;
+    
     if (!webhook) {
       return res.status(500).json({ error: 'Discord webhook not configured' });
     }
