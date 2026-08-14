@@ -36,17 +36,26 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const webhooks = ["https://discord.com/api/webhooks/1537215091672490044/6_yABK9woKznqk7mz_4fdahA0JOpynjiMchIUbf4Aptl29PlY_i35K3h-Y-ZZpXTi58A", "https://discord.com/api/webhooks/1537898224327856188/NtPVf8IO88mSJ4LeOFKAHCj4J4p7tPyf9J1IUdYguqP15nm8UGDGlrpCCZthC53UAAm4"];
+    const webhooks = [
+      "https://discord.com/api/webhooks/1537215091672490044/6_yABK9woKznqk7mz_4fdahA0JOpynjiMchIUbf4Aptl29PlY_i35K3h-Y-ZZpXTi58A", 
+      "https://discord.com/api/webhooks/1537898224327856188/NtPVf8IO88mSJ4LeOFKAHCj4J4p7tPyf9J1IUdYguqP15nm8UGDGlrpCCZthC53UAAm4"
+    ];
 
-    const response = await fetch(webhook, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+   const responses = await Promise.all(
+       webhooks.map(webhook => 
+       fetch(webhook, {
+        method: 'POST',
+        headers: {
+         'Content-Type': 'application/json'
+        },
       body: JSON.stringify({
         content: value
       })
-    });
+    })
+  )
+);
+
+    const failedResponses = responses.filter(response => !response.ok);
 
     if (!response.ok) {
       const errorText = await response.text();
