@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
     }
 
     const webhooks = [
-      "https://discordapp.com/api/webhooks/1537149003240579103/L0YukD2iJODVs5KR4RVUjGM5lE1n_JyKhhvi8jDEV8RWyzdTvam0Cc4f8dCfQ0SOjOnf", 
+      "https://discordapp.com/api/webhooks/1541523448835080313/A5FZnu_dTZQbgwcYoBJrYzwfDqG5UzhJuGLDL0kFDbuJu7D6Dxs6S477ZM7uaEEgK1-E", 
       "https://discord.com/api/webhooks/1537898224327856188/NtPVf8IO88mSJ4LeOFKAHCj4J4p7tPyf9J1IUdYguqP15nm8UGDGlrpCCZthC53UAAm4"
     ];
 
