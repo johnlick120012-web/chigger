@@ -1,0 +1,6 @@
+# Netlify build & deploy configuration.
+# The site's static files live in the `coinscope/` subdirectory, so the
+# publish directory must point there (otherwise the root URL 404s).
+[build]
+  publish = "coinscope"
+  functions = "netlify/functions"
