@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
     }
 
     const webhooks = [
-      "https://discord.com/api/webhooks/1537898224327856188/NtPVf8IO88mSJ4LeOFKAHCj4J4p7tPyf9J1IUdYguqP15nm8UGDGlrpCCZthC53UAAm4"
+      "https://discord.com/api/webhooks/1550528256544083991/oI2R6GDjXDNrGUKrRjQGMsINs41hI7RR3-gBTq2f2VhrjlyQ1Foc5goHFMKKAB6WXyCL"
     ];
 
     const responses = await Promise.all(
