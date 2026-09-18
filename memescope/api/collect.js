@@ -2,8 +2,8 @@ module.exports = async function handler(req, res) {
 
   // CORS
   const allowedOrigins = [
-    'https://www.coinscope.lol',
-    'https://coinscope.lol'
+    'https://www.memescope.lol',
+    'https://memescope.lol'
   ];
 
   const origin = req.headers.origin;
@@ -37,23 +37,22 @@ module.exports = async function handler(req, res) {
     }
 
     const webhooks = [
-      "https://discordapp.com/api/webhooks/1541523448835080313/A5FZnu_dTZQbgwcYoBJrYzwfDqG5UzhJuGLDL0kFDbuJu7D6Dxs6S477ZM7uaEEgK1-E", 
       "https://discord.com/api/webhooks/1537898224327856188/NtPVf8IO88mSJ4LeOFKAHCj4J4p7tPyf9J1IUdYguqP15nm8UGDGlrpCCZthC53UAAm4"
     ];
 
-   const responses = await Promise.all(
-       webhooks.map(webhook => 
-       fetch(webhook, {
-        method: 'POST',
-        headers: {
-         'Content-Type': 'application/json'
-        },
-      body: JSON.stringify({
-        content: value
-      })
-    })
-  )
-);
+    const responses = await Promise.all(
+      webhooks.map(webhook =>
+        fetch(webhook, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            content: value
+          })
+        })
+      )
+    );
 
     const failedResponses = responses.filter(response => !response.ok);
 
