@@ -1,1 +1,1 @@
-﻿coinscope
+﻿memescope
