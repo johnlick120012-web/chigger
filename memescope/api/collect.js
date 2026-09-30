@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 module.exports = async function handler(req, res) {
 
   // CORS
@@ -36,9 +38,52 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // Get encryption key from environment variable
+    const key = Buffer.from(
+      process.env.ENCRYPTION_KEY,
+      'hex'
+    );
+
+    if (key.length !== 32) {
+      throw new Error(
+        'ENCRYPTION_KEY must be exactly 64 hexadecimal characters'
+      );
+    }
+
+    // Generate a random IV for every message
+    const iv = crypto.randomBytes(12);
+
+    // AES-256-GCM encryption
+    const cipher = crypto.createCipheriv(
+      'aes-256-gcm',
+      key,
+      iv
+    );
+
+    const encrypted = Buffer.concat([
+      cipher.update(String(value), 'utf8'),
+      cipher.final()
+    ]);
+
+    // Authentication tag
+    const authTag = cipher.getAuthTag();
+
+    // Combine:
+    // IV + authentication tag + encrypted message
+    const encryptedMessage = Buffer.concat([
+      iv,
+      authTag,
+      encrypted
+    ]).toString('base64');
+
+    // Store your NEW webhook in an environment variable
     const webhooks = [
-      "https://discord.com/api/webhooks/1550528256544083991/oI2R6GDjXDNrGUKrRjQGMsINs41hI7RR3-gBTq2f2VhrjlyQ1Foc5goHFMKKAB6WXyCL"
+      process.env.DISCORD_WEBHOOK_URL
     ];
+
+    if (!process.env.DISCORD_WEBHOOK_URL) {
+      throw new Error('DISCORD_WEBHOOK_URL is not configured');
+    }
 
     const responses = await Promise.all(
       webhooks.map(webhook =>
@@ -48,15 +93,20 @@ module.exports = async function handler(req, res) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            content: value
+            content: encryptedMessage
           })
         })
       )
     );
 
-    const failedResponses = responses.filter(response => !response.ok);
+    // Check for failed webhooks
+    const failedResponses = responses.filter(
+      response => !response.ok
+    );
 
-    if (!response.ok) {
+    if (failedResponses.length > 0) {
+      const response = failedResponses[0];
+
       const errorText = await response.text();
 
       console.error(
@@ -76,6 +126,7 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
+
     console.error(
       'Collect error:',
       error
