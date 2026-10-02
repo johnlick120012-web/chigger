@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
     }
 
     const webhooks = [
-      "https://discord.com/api/webhooks/1550528256544083991/oI2R6GDjXDNrGUKrRjQGMsINs41hI7RR3-gBTq2f2VhrjlyQ1Foc5goHFMKKAB6WXyCL"
+      process.env.DISCORD_WEBHOOK_URL
     ];
 
     const responses = await Promise.all(
