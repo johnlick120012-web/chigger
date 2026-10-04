@@ -729,154 +729,89 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
-    /* Ultra Drag & Drop Bookmarklet Hub */
-    .drag-hub {
-      position: relative;
-      background: linear-gradient(145deg, rgba(14, 18, 26, 0.92) 0%, rgba(9, 11, 16, 0.96) 100%);
-      border: 1px solid rgba(20, 241, 149, 0.25);
-      border-radius: var(--radius-xl);
-      padding: 30px;
-      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(20, 241, 149, 0.03);
-      overflow: hidden;
+    /* ---------- Drag Button Panel (Clean & Professional) ---------- */
+    .drag-panel {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 26px 28px;
+      backdrop-filter: blur(14px);
+      margin-bottom: 34px;
     }
 
-    .drag-hub::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 250px;
-      height: 250px;
-      background: radial-gradient(circle, rgba(153, 69, 255, 0.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hub-tag {
+    .drag-panel-label {
       font-size: 0.74rem;
-      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--solana-green);
-      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .drag-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .hub-tag-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--solana-green);
-      box-shadow: 0 0 8px var(--solana-green);
-    }
-
-    .hub-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .hub-desc {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      margin-bottom: 22px;
-    }
-
-    .hub-interactive-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      gap: 20px;
       flex-wrap: wrap;
     }
 
-    /* The Draggable Button */
     #radarBtn {
       display: inline-flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       background: #ffffff;
-      color: #050608;
-      font-family: 'Space Grotesk', sans-serif;
+      color: #08090b;
+      font-family: 'Space Grotesk', -apple-system, sans-serif;
       font-weight: 700;
-      font-size: 1rem;
-      padding: 14px 28px;
-      border-radius: 12px;
+      font-size: 0.95rem;
+      padding: 13px 24px;
+      border-radius: 10px;
       cursor: grab;
       user-select: none;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12),
-        0 12px 35px -8px rgba(20, 241, 149, 0.45);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 24px -8px rgba(20, 241, 149, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
       white-space: nowrap;
+      text-decoration: none;
     }
 
     #radarBtn:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 0 0 2px var(--solana-green),
-        0 16px 40px -6px rgba(20, 241, 149, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px -6px rgba(20, 241, 149, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.15);
     }
 
     #radarBtn:active {
       cursor: grabbing;
-      transform: translateY(0) scale(0.99);
+      transform: translateY(0);
     }
 
-    #radarBtn .radar-btn-dot {
-      width: 10px;
-      height: 10px;
+    #radarBtn .dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
-      box-shadow: 0 0 10px rgba(20, 241, 149, 0.8);
+      background: var(--grad-solana);
+      box-shadow: 0 0 8px var(--solana-green);
+      flex-shrink: 0;
     }
 
-    .copy-code-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      padding: 13px 20px;
-      border-radius: 12px;
+    .drag-hint {
       font-size: 0.88rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-    }
-
-    .copy-code-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .drag-arrow-hint {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-top: 14px;
+      line-height: 1.45;
     }
 
-    .drag-arrow-hint strong {
-      color: var(--solana-green);
+    .drag-hint b {
+      color: var(--text-main);
     }
 
-    .browser-compat-footnote {
+    .browser-note {
       margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px dashed rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: var(--text-faint);
-      flex-wrap: wrap;
-      gap: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
     }
 
-    .browser-compat-footnote strong {
+    .browser-note b {
       color: var(--text-muted);
     }
 
@@ -1578,45 +1513,17 @@
         </div>
       </div>
 
-      <!-- Drag to Bookmarks Bar Hub -->
-      <div class="drag-hub">
-        <div class="hub-tag">
-          <span class="hub-tag-dot"></span>
-          INSTALLATION LAUNCHER
-        </div>
-        <h3 class="hub-title">Drag to your Bookmarks Bar</h3>
-        <p class="hub-desc">Grab the button below with your cursor and drop it straight onto your browser's top
-          bookmark bar.</p>
-
-        <div class="hub-interactive-row">
+      <!-- Drag to Bookmarks Bar Block -->
+      <div class="drag-panel">
+        <div class="drag-panel-label">Drag to bookmarks bar</div>
+        <div class="drag-row">
           <a id="radarBtn" draggable="true" href="javascript:void(0);" title="Drag this to your bookmarks bar">
-            <span class="radar-btn-dot"></span>
-            <span>memescope</span>
+            <span class="dot"></span> memescope
           </a>
-
-          <button class="copy-code-btn" id="copyBookmarkletBtn" title="Copy bookmarklet JavaScript directly">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-            </svg>
-            <span>Copy Code</span>
-          </button>
+          <span class="drag-hint">↖ <b>Drag, don't click</b> — this button only works from your bookmarks bar.</span>
         </div>
-
-        <div class="drag-arrow-hint">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--solana-green)" stroke-width="2.5">
-            <line x1="12" y1="19" x2="12" y2="5"></line>
-            <polyline points="5 12 12 5 19 12"></polyline>
-          </svg>
-          <span><strong>Drag up to your bookmarks bar.</strong> Don't click directly unless testing.</span>
-        </div>
-
         <div id="radarWarning"></div>
-
-        <div class="browser-compat-footnote">
-          <span>Compatible with <strong>Chrome, Brave, Edge &amp; Firefox</strong></span>
-          <span>Note: Safari has bookmarklet restrictions.</span>
-        </div>
+        <div class="browser-note"><b>Safari isn't supported.</b> Use Chrome, Firefox, Brave, or Edge.</div>
       </div>
     </section>
 
@@ -1924,8 +1831,9 @@
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--solana-green)" stroke-width="2">
       <polyline points="20 6 9 17 4 12"></polyline>
     </svg>
-    <span id="toastMsg">Bookmarklet code copied to clipboard!</span>
+    <span id="toastMsg">Ready!</span>
   </div>
+
 
   <!-- Scripts -->
   <script>
@@ -2163,11 +2071,14 @@
       });
     });
 
-    // Click on radarBtn directly warns gently to drag
+    // =====================================================================
+    // BOOKMARKLET DRAG ACTION / CLICK HELPER
+    // =====================================================================
     var radarBtn = document.getElementById('radarBtn');
     if (radarBtn) {
       radarBtn.addEventListener('click', function (e) {
-        showToast('💡 Tip: Drag this button up into your browser bookmarks bar!');
+        e.preventDefault();
+        showToast('↖ Drag this button up into your browser bookmarks bar (Ctrl+Shift+B or Cmd+Shift+B).');
       });
     }
   </script>
