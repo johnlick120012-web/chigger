@@ -4,411 +4,561 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>memescope — Token Scan</title>
+  <title>MemeScope — Real-Time Solana Token Risk Scanner</title>
+  <meta name="description"
+    content="Real-time Solana token scanner and risk inspector. Audit insider networks, rug risk, LP locks, and holder clusters in milliseconds.">
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
   <style>
+    :root {
+      --bg: #050608;
+      --bg-elevated: #090b10;
+      --card: rgba(14, 17, 24, 0.72);
+      --card-solid: #0d1017;
+      --card-hover: rgba(22, 27, 38, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(20, 241, 149, 0.28);
+
+      --text-main: #f5f7fb;
+      --text-muted: #9ba3b5;
+      --text-faint: #565f73;
+
+      --solana-green: #14F195;
+      --solana-purple: #9945FF;
+      --solana-cyan: #00F0FF;
+      --risk-low: #14F195;
+      --risk-med: #FFB800;
+      --risk-high: #FF3B56;
+
+      --green-dim: rgba(20, 241, 149, 0.08);
+      --green-border: rgba(20, 241, 149, 0.3);
+      --red-dim: rgba(255, 59, 86, 0.10);
+      --red-border: rgba(255, 59, 86, 0.32);
+      --amber-dim: rgba(255, 184, 0, 0.09);
+      --amber-border: rgba(255, 184, 0, 0.32);
+
+      --grad-primary: linear-gradient(135deg, #14F195 0%, #00F0FF 50%, #9945FF 100%);
+      --grad-solana: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
+      --grad-card: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+
+      --radius-xl: 20px;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+    }
+
     * {
       margin: 0;
       padding: 0;
-      box-sizing: border-box
-    }
-
-    :root {
-      --bg: #08090b;
-      --bg-raised: #0f1114;
-      --card: #131519;
-      --card-border: #22252b;
-      --card-border2: #2b2f37;
-      --text: #f2f3f5;
-      --text-dim: #9ba0ab;
-      --text-faint: #5c6169;
-      --green: #29f19c;
-      --purple: #9945ff;
-      --amber: #f5a623;
-      --red: #ff5c6c;
-      --green-dim: rgba(41, 241, 156, .08);
-      --green-border: rgba(41, 241, 156, .28);
-      --red-dim: rgba(255, 92, 108, .10);
-      --red-border: rgba(255, 92, 108, .3);
-      --amber-dim: rgba(245, 166, 35, .08);
-      --amber-border: rgba(245, 166, 35, .3);
-      --grad: linear-gradient(120deg, var(--green), var(--purple));
-      --radius: 14px;
-      --radius-sm: 9px;
-      --display: 'Space Grotesk', sans-serif;
-      --body: 'Inter', system-ui, sans-serif;
-      --mono: 'JetBrains Mono', monospace;
+      box-sizing: border-box;
     }
 
     html {
-      scroll-behavior: smooth
+      scroll-behavior: smooth;
+      color-scheme: dark;
     }
 
     body {
-      min-height: 100%;
+      min-height: 100vh;
       background: var(--bg);
-      color: var(--text);
-      font-family: var(--body);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
       position: relative;
+      line-height: 1.5;
     }
 
     a {
-      color: inherit
+      color: inherit;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* ── background texture, same language as the landing page ── */
-    .bg-glow {
+    /* ── Ambient Background Lighting & Cyber Grid ── */
+    .bg-mesh {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background:
-        radial-gradient(600px 400px at 82% 0%, rgba(153, 69, 255, .12), transparent 60%),
-        radial-gradient(500px 380px at 10% 30%, rgba(41, 241, 156, .07), transparent 60%);
+      overflow: hidden;
     }
 
-    .bg-grid {
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+      pointer-events: none;
+      animation: orbFloat 22s ease-in-out infinite alternate;
+    }
+
+    .ambient-orb-1 {
+      width: 650px;
+      height: 480px;
+      top: -80px;
+      right: 8%;
+      background: radial-gradient(circle, var(--solana-purple) 0%, rgba(153, 69, 255, 0) 70%);
+    }
+
+    .ambient-orb-2 {
+      width: 600px;
+      height: 500px;
+      top: 25%;
+      left: -100px;
+      background: radial-gradient(circle, var(--solana-green) 0%, rgba(20, 241, 149, 0) 70%);
+      animation-duration: 26s;
+      animation-delay: -6s;
+    }
+
+    .ambient-orb-3 {
+      width: 500px;
+      height: 400px;
+      bottom: 5%;
+      right: 15%;
+      background: radial-gradient(circle, var(--solana-cyan) 0%, rgba(0, 240, 255, 0) 70%);
+      opacity: 0.16;
+      animation-duration: 30s;
+      animation-delay: -12s;
+    }
+
+    @keyframes orbFloat {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate(35px, 25px) scale(1.06);
+      }
+
+      100% {
+        transform: translate(-25px, -15px) scale(0.96);
+      }
+    }
+
+    .cyber-grid {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      opacity: .3;
-      background-image: linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
-      background-size: 42px 42px;
-      mask-image: radial-gradient(ellipse 90% 50% at 50% 0%, black 40%, transparent 85%);
+      opacity: 0.20;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(ellipse 90% 55% at 50% 10%, black 40%, transparent 85%);
     }
 
-    /* ── NAV ── */
+    /* ── Top Navigation Bar ── */
     .top-nav {
-      position: relative;
-      z-index: 5;
-      background: rgba(8, 9, 11, .9);
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid rgba(255, 255, 255, .06);
-      padding: 0 clamp(16px, 4vw, 32px);
-      height: 58px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 6, 8, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0 clamp(18px, 4vw, 36px);
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 1.02rem;
-      text-decoration: none
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      text-decoration: none;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
     }
 
-    .logo-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      background: var(--grad);
+    .logo-icon-wrap {
       position: relative;
-      flex-shrink: 0
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 16px -2px rgba(20, 241, 149, 0.45);
     }
 
-    .logo-mark::after {
-      content: "";
+    .logo-icon-wrap::after {
+      content: '';
       position: absolute;
-      inset: 6px;
-      border: 1.5px solid rgba(8, 9, 11, .55);
-      border-radius: 4px
+      inset: 1.5px;
+      background: #090b10;
+      border-radius: 8px;
+      z-index: 1;
     }
 
-    .logo-name {
-      font-family: var(--display)
+    .logo-icon-svg {
+      position: relative;
+      z-index: 2;
+      color: var(--solana-green);
     }
 
     .logo-name span {
-      color: var(--green)
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     .nav-right {
       display: flex;
       align-items: center;
-      gap: 10px
+      gap: 14px;
+    }
+
+    .nav-home-link {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-home-link:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--card-border);
     }
 
     .live-pill {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      font-family: var(--mono);
-      font-size: 11px;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
       font-weight: 600;
-      color: var(--text-dim);
-      background: var(--bg-raised);
-      border: 1px solid var(--card-border);
-      padding: 5px 11px;
-      border-radius: 20px;
-      letter-spacing: .3px;
+      color: var(--solana-green);
+      background: rgba(20, 241, 149, 0.08);
+      border: 1px solid rgba(20, 241, 149, 0.28);
+      padding: 5px 12px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
     }
 
     .live-pill .dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
-      animation: pulse 1.8s infinite
+      background: var(--solana-green);
+      box-shadow: 0 0 8px var(--solana-green);
+      animation: radarPulse 1.8s infinite;
     }
 
     .live-pill .dot.slow {
-      background: var(--amber);
-      box-shadow: 0 0 8px var(--amber)
+      background: var(--risk-med);
+      box-shadow: 0 0 8px var(--risk-med);
     }
 
     .live-pill .dot.off {
       background: var(--text-faint);
       box-shadow: none;
-      animation: none
+      animation: none;
     }
 
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1
+    @keyframes radarPulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 1;
       }
 
       50% {
-        opacity: .3
+        transform: scale(1.4);
+        opacity: 0.4;
+      }
+
+      100% {
+        transform: scale(0.9);
+        opacity: 1;
       }
     }
 
-    /* ── SEARCH ── */
+    /* ── Search Bar Section ── */
     .search-bar {
       position: relative;
       z-index: 2;
-      padding: 16px clamp(16px, 4vw, 32px);
-      border-bottom: 1px solid rgba(255, 255, 255, .06)
+      padding: 16px clamp(18px, 4vw, 36px);
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(5, 6, 8, 0.4);
+      backdrop-filter: blur(10px);
     }
 
     .search-bar-inner {
       max-width: 1280px;
       margin: 0 auto;
       display: flex;
-      gap: 10px
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ca-input-wrap {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .ca-input-icon {
+      position: absolute;
+      left: 16px;
+      color: var(--solana-green);
+      pointer-events: none;
     }
 
     .ca-input {
-      flex: 1;
+      width: 100%;
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-family: var(--mono);
-      font-size: 12.5px;
+      border-radius: var(--radius-md);
+      padding: 13px 18px 13px 44px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
       font-weight: 500;
-      color: var(--text);
+      color: var(--text-main);
       outline: none;
-      transition: border-color .15s
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: all 0.25s ease;
     }
 
     .ca-input:focus {
-      border-color: var(--green)
+      border-color: rgba(20, 241, 149, 0.45);
+      box-shadow: 0 0 25px -4px rgba(20, 241, 149, 0.25);
+      background: rgba(20, 25, 36, 0.9);
     }
 
     .ca-input::placeholder {
-      color: var(--text-faint)
+      color: var(--text-faint);
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .scan-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: #fff;
-      color: #08090b;
+      gap: 9px;
+      background: var(--grad-solana);
+      color: #050608;
       border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      font-family: var(--display);
-      font-size: 13px;
+      border-radius: var(--radius-md);
+      padding: 13px 24px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
       font-weight: 700;
-      letter-spacing: .2px;
+      letter-spacing: 0.02em;
       cursor: pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       white-space: nowrap;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, .08), 0 10px 24px -10px rgba(41, 241, 156, .3);
+      box-shadow: 0 0 20px -3px rgba(20, 241, 149, 0.35);
     }
 
     .scan-btn:hover {
-      transform: translateY(-1px)
+      transform: translateY(-1px);
+      box-shadow: 0 0 25px rgba(20, 241, 149, 0.55);
     }
 
-    .scan-btn .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--grad)
+    .scan-btn:active {
+      transform: translateY(0);
     }
 
-    /* ── TOKEN HEADER ── */
+    /* ── Token Header Banner ── */
     .token-header {
       position: relative;
       z-index: 2;
-      padding: 18px clamp(16px, 4vw, 32px) 4px
+      padding: 22px clamp(18px, 4vw, 36px) 6px;
     }
 
     .token-header-inner {
       max-width: 1280px;
       margin: 0 auto;
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 18px 22px;
+      background: linear-gradient(145deg, rgba(14, 18, 26, 0.85) 0%, rgba(9, 11, 16, 0.95) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: var(--radius-xl);
+      padding: 20px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 30px rgba(20, 241, 149, 0.02);
+      backdrop-filter: blur(16px);
     }
 
     .token-left {
       display: flex;
       align-items: center;
-      gap: 14px;
-      min-width: 0
+      gap: 16px;
+      min-width: 0;
     }
 
     .token-img {
-      width: 52px;
-      height: 52px;
-      border-radius: 10px;
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
       object-fit: cover;
       flex-shrink: 0;
-      background: var(--bg-raised);
-      border: 1px solid var(--card-border)
+      background: #11141c;
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
     }
 
     .token-name-wrap {
-      min-width: 0
+      min-width: 0;
     }
 
     .token-name {
-      font-family: var(--display);
-      font-size: 22px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
       font-weight: 700;
-      color: #fff;
+      color: #ffffff;
       line-height: 1.15;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 460px
+      max-width: 480px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
     }
 
     .token-links {
       display: flex;
-      gap: 6px;
+      gap: 7px;
       margin-top: 8px;
       flex-wrap: wrap;
-      align-items: center
+      align-items: center;
     }
 
     .token-link {
-      font-family: var(--mono);
-      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
       font-weight: 600;
-      letter-spacing: .4px;
-      color: var(--text-dim);
-      background: var(--bg-raised);
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.035);
       border: 1px solid var(--card-border);
-      border-radius: 6px;
+      border-radius: 7px;
       padding: 4px 10px;
       text-decoration: none;
       cursor: pointer;
-      transition: border-color .15s, color .15s;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 4px
+      gap: 5px;
     }
 
     .token-link:hover {
-      color: #fff;
-      border-color: var(--card-border2)
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
     }
 
     .token-link.pump {
-      border-color: rgba(245, 166, 35, .35);
-      color: var(--amber)
+      border-color: rgba(255, 184, 0, 0.35);
+      color: #FFB800;
     }
 
     .token-link.dex {
       border-color: var(--green-border);
-      color: var(--green)
+      color: var(--solana-green);
     }
 
     .token-link.sol {
-      border-color: rgba(153, 69, 255, .4);
-      color: var(--purple)
+      border-color: rgba(153, 69, 255, 0.4);
+      color: var(--solana-purple);
     }
 
     .token-right {
       text-align: right;
-      flex-shrink: 0
+      flex-shrink: 0;
+    }
+
+    .token-price-label {
+      font-size: 0.75rem;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+      font-weight: 600;
     }
 
     .token-price {
-      font-family: var(--mono);
-      font-size: 26px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.75rem;
       font-weight: 700;
-      color: #fff
+      color: #ffffff;
     }
 
-    /* ── LAYOUT ── */
+    /* ── Page Wrap Layout ── */
     .page-wrap {
       position: relative;
       z-index: 1;
       max-width: 1280px;
       margin: 0 auto;
-      padding: 18px clamp(16px, 4vw, 32px) 40px
+      padding: 20px clamp(18px, 4vw, 36px) 60px;
     }
 
     .three-col {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-      align-items: start
+      gap: 18px;
+      align-items: start;
     }
 
-    @media(max-width:980px) {
+    @media (max-width: 1040px) {
       .three-col {
-        grid-template-columns: 1fr 1fr
+        grid-template-columns: 1fr 1fr;
       }
     }
 
-    @media(max-width:640px) {
+    @media (max-width: 680px) {
       .three-col {
-        grid-template-columns: 1fr
+        grid-template-columns: 1fr;
       }
     }
 
     .col {
       display: flex;
       flex-direction: column;
-      gap: 16px
+      gap: 18px;
     }
 
-    /* ── CARDS (shared component language w/ landing page) ── */
+    /* ── Modern Glass Cards ── */
     .card {
       background: var(--card);
       border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      padding: 20px 22px
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.14);
+      background: var(--card-hover);
     }
 
     .card-head {
@@ -416,381 +566,417 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 16px
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .card-head-title {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: .86rem;
+      gap: 9px;
+      font-size: 0.9rem;
       font-weight: 600;
-      color: var(--text-dim)
+      color: var(--text-main);
     }
 
     .card-head-title svg {
-      opacity: .8;
-      flex-shrink: 0
+      color: var(--solana-green);
+      flex-shrink: 0;
     }
 
     .card-head-meta {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-faint);
-      font-weight: 600
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      font-weight: 600;
     }
 
     .beta-tag {
-      font-family: var(--mono);
-      font-size: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
       font-weight: 700;
-      color: var(--purple);
-      border: 1px solid rgba(153, 69, 255, .35);
-      background: rgba(153, 69, 255, .08);
-      padding: 1px 5px;
-      border-radius: 3px;
-      letter-spacing: 1px;
+      color: var(--solana-purple);
+      border: 1px solid rgba(153, 69, 255, 0.35);
+      background: rgba(153, 69, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.08em;
       margin-left: 6px;
-      vertical-align: middle
+      vertical-align: middle;
     }
 
-    /* ── GAUGE (reused straight from the landing-page preview) ── */
+    /* ── Gauge ── */
     .gauge-wrap {
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 4px 0 2px
+      padding: 4px 0 2px;
     }
 
     .gauge-num {
-      font-family: var(--mono);
-      font-size: 2rem;
-      font-weight: 600;
-      margin-top: -46px
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-top: -46px;
+      line-height: 1;
+      color: #ffffff;
     }
 
     .gauge-num span {
-      font-size: 1rem;
-      color: var(--text-faint)
+      font-size: 1.1rem;
+      color: var(--text-faint);
+      font-weight: 500;
     }
 
     .gauge-tag {
-      font-size: .8rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: .04em;
-      margin-top: 2px
+      letter-spacing: 0.06em;
+      padding: 3px 12px;
+      border-radius: 999px;
+      margin-top: 6px;
     }
 
     .gauge-tag.good {
-      color: var(--green)
+      background: rgba(20, 241, 149, 0.12);
+      color: var(--solana-green);
+      border: 1px solid rgba(20, 241, 149, 0.3);
     }
 
     .gauge-tag.caution {
-      color: var(--amber)
+      background: rgba(255, 184, 0, 0.12);
+      color: var(--risk-med);
+      border: 1px solid rgba(255, 184, 0, 0.3);
     }
 
     .gauge-tag.danger {
-      color: var(--red)
+      background: rgba(255, 59, 86, 0.15);
+      color: var(--risk-high);
+      border: 1px solid rgba(255, 59, 86, 0.35);
     }
 
     .gauge-tag.neutral {
-      color: var(--text-faint)
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid var(--card-border);
     }
 
     .gauge-sub {
       color: var(--text-faint);
-      font-size: .76rem;
+      font-size: 0.76rem;
       text-align: center;
       margin-top: 8px;
-      max-width: 24ch
+      max-width: 26ch;
     }
 
-    /* ── FLAG ROWS ── */
+    /* ── Risk Flags ── */
     .flag-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 14px
+      gap: 8px;
+      margin-top: 16px;
     }
 
     .flag-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      background: var(--bg-raised);
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.025);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 9px 12px
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+
+    .flag-row:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .flag-name {
-      font-size: 12px;
+      font-size: 0.85rem;
       font-weight: 600;
-      color: var(--text)
+      color: var(--text-main);
     }
 
     .flag-desc {
       font-weight: 400;
-      color: var(--text-faint);
-      font-size: 10.5px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
       margin-top: 3px;
-      line-height: 1.35
+      line-height: 1.4;
     }
 
     .flag-level {
-      font-family: var(--mono);
-      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 5px;
       white-space: nowrap;
-      letter-spacing: .6px
+      letter-spacing: 0.06em;
     }
 
     .flag-level.danger {
       background: var(--red-dim);
       border: 1px solid var(--red-border);
-      color: var(--red)
+      color: var(--risk-high);
     }
 
     .flag-level.warn {
       background: var(--amber-dim);
       border: 1px solid var(--amber-border);
-      color: var(--amber)
+      color: var(--risk-med);
     }
 
     .flag-level.info {
-      background: rgba(153, 69, 255, .08);
-      border: 1px solid rgba(153, 69, 255, .28);
-      color: var(--purple)
+      background: rgba(153, 69, 255, 0.1);
+      border: 1px solid rgba(153, 69, 255, 0.3);
+      color: var(--solana-purple);
     }
 
     .ok-row {
       display: flex;
       align-items: center;
-      gap: 9px;
-      margin-top: 14px;
+      gap: 10px;
+      margin-top: 16px;
       background: var(--green-dim);
       border: 1px solid var(--green-border);
-      border-radius: 8px;
-      padding: 11px 14px;
-      font-size: 12px;
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-size: 0.84rem;
       font-weight: 700;
-      color: var(--green);
-      font-family: var(--mono)
+      color: var(--solana-green);
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .insider-analysis {
-      margin-top: 16px
+      margin-top: 18px;
     }
 
     .ia-label {
-      font-size: 11px;
+      font-size: 0.78rem;
       font-weight: 600;
-      letter-spacing: .3px;
-      color: var(--text-dim);
-      margin-bottom: 7px;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
       display: flex;
-      align-items: center
+      align-items: center;
     }
 
     .ia-box {
-      font-size: 12px;
+      font-size: 0.82rem;
       font-weight: 500;
-      color: #f2a9ae;
+      color: #ff9da8;
       cursor: help;
       background: var(--red-dim);
       border: 1px solid var(--red-border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      line-height: 1.4
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      line-height: 1.45;
     }
 
     .launch-insights {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 14px;
-      font-size: 11px;
+      margin-top: 16px;
+      font-size: 0.78rem;
       font-weight: 600;
-      color: var(--text-dim)
+      color: var(--text-muted);
     }
 
     .li-badge {
-      font-family: var(--mono);
-      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 9px;
       border-radius: 6px;
-      letter-spacing: .4px;
-      white-space: nowrap
+      letter-spacing: 0.04em;
+      white-space: nowrap;
     }
 
     .li-badge.anomaly {
       background: var(--red-dim);
       border: 1px solid var(--red-border);
-      color: var(--red)
+      color: var(--risk-high);
     }
 
     .li-badge.clean {
       background: var(--green-dim);
       border: 1px solid var(--green-border);
-      color: var(--green)
+      color: var(--solana-green);
     }
 
-    /* ── KV ── */
+    /* ── Key-Value Telemetry Rows ── */
     .kv {
-      width: 100%
+      width: 100%;
     }
 
     .kv-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 9px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, .045);
-      font-size: .83rem
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+      font-size: 0.84rem;
     }
 
     .kv-row:last-child {
-      border-bottom: none
+      border-bottom: none;
+      padding-bottom: 0;
     }
 
     .kv-row .k {
-      color: var(--text-dim)
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .kv-row .v {
-      font-family: var(--mono);
+      font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
-      color: var(--text);
-      font-size: 12.5px
+      color: var(--text-main);
+      font-size: 0.85rem;
     }
 
     .kv-row .v.green {
-      color: var(--green)
+      color: var(--solana-green);
     }
 
     .kv-row .v.red {
-      color: var(--red)
+      color: var(--risk-high);
     }
 
     .kv-row .v.amber {
-      color: var(--amber)
+      color: var(--risk-med);
     }
 
     .kv-row a.v {
       text-decoration: underline;
-      text-decoration-color: var(--card-border2)
+      text-decoration-color: rgba(255, 255, 255, 0.2);
+      color: var(--solana-cyan);
     }
 
-    /* ── BARS ── */
+    .kv-row a.v:hover {
+      color: #ffffff;
+      text-decoration-color: var(--solana-cyan);
+    }
+
+    /* ── Progress Bars ── */
     .bar-row {
-      margin-top: 16px
+      margin-top: 16px;
     }
 
     .bar-row:first-child {
-      margin-top: 2px
+      margin-top: 4px;
     }
 
     .bar-top {
       display: flex;
       justify-content: space-between;
-      font-size: .8rem;
-      margin-bottom: 6px
+      font-size: 0.82rem;
+      margin-bottom: 6px;
     }
 
     .bar-top .k {
-      color: var(--text-dim)
+      color: var(--text-muted);
     }
 
     .bar-top .v {
-      font-family: var(--mono);
-      font-weight: 600
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
     }
 
     .bar-track {
-      height: 5px;
-      background: var(--bg-raised);
-      border-radius: 4px;
-      overflow: hidden
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      overflow: hidden;
     }
 
     .bar-fill {
       height: 100%;
-      border-radius: 4px;
-      transition: width .3s ease
+      border-radius: 999px;
+      transition: width 0.4s ease, background 0.4s ease;
     }
 
     .creator-hist {
-      font-family: var(--mono);
-      font-size: 11px;
-      margin-top: 14px;
-      color: var(--text-dim);
-      padding: 9px 12px;
-      background: var(--bg-raised);
-      border-radius: 8px;
-      border: 1px solid var(--card-border)
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      margin-top: 16px;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.025);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--card-border);
     }
 
     .creator-hist strong {
-      color: #fff
+      color: #ffffff;
     }
 
-    /* ── DATA TABLE (insider networks) ── */
+    /* ── Data Table (Insider Networks) ── */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+    }
+
     table.dt {
       width: 100%;
       border-collapse: collapse;
-      font-size: 11px
+      font-size: 0.8rem;
     }
 
     table.dt th {
-      font-family: var(--mono);
-      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--text-faint);
-      padding: 0 8px 8px 0;
+      padding: 0 10px 10px 0;
       border-bottom: 1px solid var(--card-border);
       text-align: left;
-      white-space: nowrap
+      white-space: nowrap;
     }
 
     table.dt td {
-      padding: 8px 8px 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, .04);
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
-      white-space: nowrap
+      padding: 10px 10px 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
     }
 
     table.dt tr:last-child td {
-      border-bottom: none
+      border-bottom: none;
     }
 
     table.dt td.addr {
-      color: #fff;
-      font-weight: 600
+      color: #ffffff;
+      font-weight: 600;
     }
 
     .type-badge {
-      font-family: var(--mono);
-      font-size: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
       font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 3px;
+      padding: 2px 6px;
+      border-radius: 4px;
       background: var(--red-dim);
       border: 1px solid var(--red-border);
-      color: var(--red);
-      margin-left: 5px;
-      letter-spacing: .6px
+      color: var(--risk-high);
+      margin-left: 6px;
+      letter-spacing: 0.04em;
     }
 
-    /* ── IDLE / STATE SCREENS ── */
+    /* ── State & Idle Screens ── */
     .idle-screen {
       position: relative;
       z-index: 1;
@@ -798,126 +984,194 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 100px 24px 80px;
-      text-align: center
+      padding: 80px 24px 70px;
+      text-align: center;
     }
 
     .idle-eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: .76rem;
-      letter-spacing: .08em;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--text-dim);
-      border: 1px solid var(--card-border);
-      background: rgba(255, 255, 255, .02);
-      padding: 6px 12px;
+      color: var(--solana-green);
+      border: 1px solid rgba(20, 241, 149, 0.25);
+      background: rgba(20, 241, 149, 0.06);
+      padding: 6px 14px;
       border-radius: 999px;
-      margin-bottom: 24px
+      margin-bottom: 24px;
+      font-weight: 600;
     }
 
     .idle-eyebrow .dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green)
+      background: var(--solana-green);
+      box-shadow: 0 0 8px var(--solana-green);
+    }
+
+    .idle-radar-visual {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 1px dashed rgba(20, 241, 149, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+      background: radial-gradient(circle, rgba(20, 241, 149, 0.08) 0%, transparent 70%);
+    }
+
+    .idle-radar-visual::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(153, 69, 255, 0.3);
     }
 
     .idle-title {
-      font-family: var(--display);
-      font-size: clamp(2rem, 4.4vw, 2.9rem);
-      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4.4vw, 3rem);
+      font-weight: 800;
       line-height: 1.1;
-      max-width: 16ch
+      max-width: 18ch;
+      letter-spacing: -0.02em;
     }
 
     .idle-title .grad {
-      background: var(--grad);
+      background: var(--grad-primary);
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent
+      color: transparent;
     }
 
     .idle-msg {
-      color: var(--text-dim);
-      font-size: .98rem;
-      line-height: 1.6;
-      max-width: 44ch;
-      margin: 18px 0 28px
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.65;
+      max-width: 48ch;
+      margin: 18px 0 28px;
     }
 
     .idle-msg b {
-      color: var(--text)
+      color: var(--text-main);
     }
 
     .idle-platforms {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       justify-content: center;
-      flex-wrap: wrap
+      flex-wrap: wrap;
     }
 
     .idle-platform {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .6px;
-      background: var(--bg-raised);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--card-border);
-      border-radius: 7px;
-      padding: 7px 16px;
-      color: var(--text-faint)
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: var(--text-muted);
     }
 
     .idle-platform.active {
       border-color: var(--green-border);
-      color: var(--green);
-      background: var(--green-dim)
+      color: var(--solana-green);
+      background: var(--green-dim);
+    }
+
+    /* Quick sample coin chips on idle screen */
+    .sample-ca-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .sample-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sample-chip:hover {
+      color: var(--text-main);
+      border-color: var(--solana-green);
+      background: rgba(20, 241, 149, 0.08);
+      transform: translateY(-1px);
     }
 
     .state-msg {
       position: relative;
       z-index: 1;
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 11px;
+      color: var(--solana-green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
       letter-spacing: 2px;
       text-align: center;
       padding: 100px 20px;
-      text-transform: uppercase
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
 
     .err-msg {
       position: relative;
       z-index: 1;
-      color: var(--red);
-      font-family: var(--body);
-      font-size: 14px;
+      color: var(--risk-high);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
       text-align: center;
-      padding: 60px 20px
+      padding: 60px 20px;
+      background: var(--red-dim);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      margin: 40px auto;
     }
 
-    /* ── FOOTER ── */
+    /* ── Footer ── */
     footer {
       position: relative;
       z-index: 1;
-      border-top: 1px solid rgba(255, 255, 255, .06);
-      padding: 22px clamp(16px, 4vw, 32px);
+      border-top: 1px solid var(--card-border);
+      padding: 26px clamp(18px, 4vw, 36px);
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: var(--text-faint);
-      font-size: .8rem;
+      font-size: 0.82rem;
       flex-wrap: wrap;
-      gap: 10px
+      gap: 12px;
+      background: rgba(5, 6, 8, 0.95);
     }
 
-    @media(prefers-reduced-motion:reduce) {
-      * {
+    footer a:hover {
+      color: var(--text-main);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      ::before,
+      ::after {
         animation: none !important;
-        transition: none !important
+        transition: none !important;
       }
     }
   </style>
@@ -925,15 +1179,36 @@
 
 <body>
 
-  <div class="bg-glow"></div>
-  <div class="bg-grid"></div>
+  <!-- Ambient Mesh Lighting & Grid Background -->
+  <div class="bg-mesh">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+    <div class="cyber-grid"></div>
+  </div>
 
+  <!-- Navigation Header -->
   <nav class="top-nav">
-    <a class="logo" href="#">
-      <div class="logo-mark"></div>
-      <div class="logo-name">Coin<span>scope</span></div>
+    <a class="logo" href="index.html">
+      <div class="logo-icon-wrap">
+        <svg class="logo-icon-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 3a9 9 0 0 1 9 9" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </div>
+      <div class="logo-name">Meme<span>Scope</span></div>
     </a>
+
     <div class="nav-right">
+      <a href="index.html" class="nav-home-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Bookmarklet Setup</span>
+      </a>
       <div class="live-pill" id="liveStatus" style="display:none">
         <span class="dot" id="liveDot"></span>
         <span id="liveStatusText">LIVE</span>
@@ -941,15 +1216,28 @@
     </div>
   </nav>
 
+  <!-- Search / Contract Address Bar -->
   <div class="search-bar">
     <div class="search-bar-inner">
-      <input class="ca-input" id="ca" placeholder="Paste contract address (CA)…" autocomplete="off"
-        spellcheck="false" />
-      <button class="scan-btn" id="scanBtn"><span class="dot"></span>Scan</button>
+      <div class="ca-input-wrap">
+        <svg class="ca-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input class="ca-input" id="ca" placeholder="Paste Solana contract address (CA) e.g. 7Ahx...pump"
+          autocomplete="off" spellcheck="false" />
+      </div>
+      <button class="scan-btn" id="scanBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+        <span>Audit Coin</span>
+      </button>
     </div>
   </div>
 
-  <!-- TOKEN HEADER -->
+  <!-- Active Token Header Banner -->
   <div id="tokenHeader" style="display:none" class="token-header">
     <div class="token-header-inner">
       <div class="token-left">
@@ -960,34 +1248,61 @@
         </div>
       </div>
       <div class="token-right">
+        <div class="token-price-label">Real-Time Price</div>
         <div class="token-price" id="tPrice">—</div>
       </div>
     </div>
   </div>
 
+  <!-- Main Results Container -->
   <div class="page-wrap">
     <div id="mainWrap">
       <div class="idle-screen">
-        <div class="idle-eyebrow"><span class="dot"></span>Bookmarklet · no install</div>
+        <div class="idle-eyebrow">
+          <span class="dot"></span>
+          <span>AUTOMATIC RADAR ENGINE</span>
+        </div>
+
+        <div class="idle-radar-visual">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--solana-green)" stroke-width="2">
+            <circle cx="12" cy="12" r="9" />
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 3a9 9 0 0 1 9 9" />
+          </svg>
+        </div>
+
         <div class="idle-title">Waiting for a <span class="grad">coin to scan.</span></div>
         <div class="idle-msg">
-          Click the <b>memescope</b> bookmark while viewing a token on <b>Axiom</b> or <b>Padre</b> —
+          Click the <b>memescope</b> bookmarklet while viewing any token on <b>Axiom</b>, <b>Padre</b>, or
+          <b>DexScreener</b> —
           the scan loads automatically. Or paste a contract address above.
         </div>
         <div class="idle-platforms">
           <div class="idle-platform active">Axiom</div>
           <div class="idle-platform active">Padre</div>
-          <div class="idle-platform">GMGN — coming soon</div>
+          <div class="idle-platform active">DexScreener</div>
+          <div class="idle-platform active">Photon</div>
+          <div class="idle-platform">GMGN</div>
+        </div>
+
+        <!-- Interactive quick demo pills -->
+        <div class="sample-ca-strip">
+          <span style="font-size:0.76rem; color:var(--text-faint); margin-right:4px;">Try sample:</span>
+          <button class="sample-chip" data-testca="DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263">BONK</button>
+          <button class="sample-chip" data-testca="EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm">WIF</button>
+          <button class="sample-chip" data-testca="6p6xgHyF7AeQHyiaGyQJaodYwZLDJCHJhzbd1fEypump">TRUMP</button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Footer -->
   <footer>
-    <span>© 2026 memescope · memescope.app</span>
-    <span>Not financial advice. Always verify on-chain.</span>
+    <span>© 2026 memescope · On-Chain Solana Security Engine</span>
+    <span>Not financial advice. Always verify on-chain before aping.</span>
   </footer>
 
+  <!-- Logic Scripts -->
   <script>
     function fmt(n) { if (n == null || isNaN(n)) return 'N/A'; if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B'; if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M'; if (n >= 1e3) return '$' + (n / 1e3).toFixed(1) + 'K'; return '$' + n.toFixed(2); }
     var SUBSCRIPT_DIGITS = ['\u2080', '\u2081', '\u2082', '\u2083', '\u2084', '\u2085', '\u2086', '\u2087', '\u2088', '\u2089'];
@@ -1044,13 +1359,13 @@
 
     function scan(ca) {
       if (!ca || ca.length < 32) {
-        document.getElementById('mainWrap').innerHTML = '<div class="err-msg">Invalid address — must be 32–44 characters.</div>';
+        document.getElementById('mainWrap').innerHTML = '<div class="err-msg">Invalid Solana token address — contract addresses must be 32–44 characters.</div>';
         document.getElementById('liveStatus').style.display = 'none';
         return;
       }
       currentCA = ca;
       document.getElementById('ca').value = ca;
-      document.getElementById('mainWrap').innerHTML = '<div class="state-msg">Scanning…</div>';
+      document.getElementById('mainWrap').innerHTML = '<div class="state-msg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 9 9"/></svg>Scanning Solana On-Chain Telemetry…</div>';
       refreshSecs = BASE_REFRESH_SECS;
       consecutiveErrors = 0;
       fetchPair(ca, true);
@@ -1128,16 +1443,16 @@
       return sources;
     }
 
-    // Semi-circle gauge, same geometry as the memescope landing-page preview.
-    // Arc length ≈ 238.76 (r=76 half circle); offset shrinks as score/100 rises.
+    // High-Tech Semi-Circle Gauge SVG with Solana Gradient / Neon Glow
     function gaugeSvg(score, sc) {
       var pct = score != null ? Math.max(0, Math.min(100, score)) : 0;
       var arcLen = 238.76;
       var offset = (arcLen * (1 - pct / 100)).toFixed(1);
-      var color = sc === 'good' ? '#29f19c' : sc === 'caution' ? '#f5a623' : sc === 'danger' ? '#ff5c6c' : '#5c6169';
-      return '<svg width="176" height="98" viewBox="0 0 180 100">'
-        + '<path d="M 14 92 A 76 76 0 0 1 166 92" fill="none" stroke="#22252b" stroke-width="10" stroke-linecap="round"/>'
-        + '<path d="M 14 92 A 76 76 0 0 1 166 92" fill="none" stroke="' + color + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + arcLen + '" stroke-dashoffset="' + offset + '"/>'
+      var color = sc === 'good' ? '#14F195' : sc === 'caution' ? '#FFB800' : sc === 'danger' ? '#FF3B56' : '#565f73';
+      var glow = sc === 'good' ? 'rgba(20,241,149,0.35)' : sc === 'caution' ? 'rgba(255,184,0,0.35)' : sc === 'danger' ? 'rgba(255,59,86,0.35)' : 'none';
+      return '<svg width="190" height="105" viewBox="0 0 180 100">'
+        + '<path d="M 14 92 A 76 76 0 0 1 166 92" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="11" stroke-linecap="round"/>'
+        + '<path d="M 14 92 A 76 76 0 0 1 166 92" fill="none" stroke="' + color + '" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + arcLen + '" stroke-dashoffset="' + offset + '" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1); filter: drop-shadow(0 0 8px ' + glow + ');"/>'
         + '</svg>';
     }
 
@@ -1151,7 +1466,7 @@
       var hdr = document.getElementById('tokenHeader');
       hdr.style.display = 'block';
 
-      var displayName = sym && sym !== name ? name + ' <span style="color:var(--text-dim);font-size:15px;font-weight:500">(' + esc(sym) + ')</span>' : esc(name);
+      var displayName = sym && sym !== name ? name + ' <span style="color:var(--text-muted);font-size:15px;font-weight:500">(' + esc(sym) + ')</span>' : esc(name);
       document.getElementById('tName').innerHTML = displayName;
       document.getElementById('tPrice').textContent = price != null ? fmtP(price) : '—';
 
@@ -1210,12 +1525,12 @@
       /* ─── COL 1: Risk Score ─── */
       h += '<div class="col">';
       h += '<div class="card">';
-      h += '<div class="card-head"><span class="card-head-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Risk Score</span><span class="card-head-meta">' + (score != null ? score + ' / 100' : '—') + '</span></div>';
+      h += '<div class="card-head"><span class="card-head-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Threat Radar Score</span><span class="card-head-meta">' + (score != null ? score + ' / 100' : '—') + '</span></div>';
       h += '<div class="gauge-wrap">';
       h += gaugeSvg(score, sc);
       h += '<div class="gauge-num">' + (score != null ? score : '—') + (score != null ? '<span>/100</span>' : '') + '</div>';
       h += '<div class="gauge-tag ' + sc + '">' + verdictWord.toUpperCase() + '</div>';
-      h += '<div class="gauge-sub">Based on on-chain risk checks &amp; insider-network analysis</div>';
+      h += '<div class="gauge-sub">Based on 24+ algorithmic audits &amp; insider wallet cluster mapping</div>';
       h += '</div>';
 
       if (risks.length > 0) {
@@ -1228,10 +1543,10 @@
           h += '<span class="flag-level ' + lvlCls + '">' + lvlTxt + '</span>';
           h += '</div>';
         });
-        if (risks.length > 7) h += '<div style="font-family:var(--mono);font-size:10px;color:var(--text-faint);margin-top:8px;text-align:center">+' + (risks.length - 7) + ' more warnings</div>';
+        if (risks.length > 7) h += '<div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--text-faint);margin-top:8px;text-align:center">+' + (risks.length - 7) + ' additional warnings</div>';
         h += '</div>';
       } else if (hasScore) {
-        h += '<div class="ok-row"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#29f19c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No risks detected</div>';
+        h += '<div class="ok-row"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="var(--solana-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No on-chain flags detected</div>';
       }
 
       if (insiderNets.length > 0) {
@@ -1247,18 +1562,18 @@
         var topAccs = topNet.size || topNet.activeAccounts || topNet.accounts || 0;
         var iaTip = 'Network sent ' + (topPct != null ? topPct.toFixed(1) + '%' : '—') + ' of the supply to ' + topAccs + ' wallet' + (topAccs !== 1 ? 's' : '') + ' (' + topName + ')';
         h += '<div class="insider-analysis">';
-        h += '<div class="ia-label">Insider Analysis<span class="beta-tag">BETA</span></div>';
-        h += '<div class="ia-box" title="' + esc(iaTip) + '">' + (topAdj != null ? fmtS(topAdj) : '—') + ' tokens sent between insiders' + (topPct != null ? ' (' + topPct.toFixed(1) + '% of supply)' : '') + '</div>';
+        h += '<div class="ia-label">Insider Cluster Analysis<span class="beta-tag">BETA</span></div>';
+        h += '<div class="ia-box" title="' + esc(iaTip) + '">' + (topAdj != null ? fmtS(topAdj) : '—') + ' tokens dispersed between insiders' + (topPct != null ? ' (' + topPct.toFixed(1) + '% of supply)' : '') + '</div>';
         h += '</div>';
-        h += '<div class="launch-insights"><span>Launch Insights<span class="beta-tag">BETA</span></span><span class="li-badge anomaly">Anomaly Found</span></div>';
+        h += '<div class="launch-insights"><span>Launch Velocity<span class="beta-tag">BETA</span></span><span class="li-badge anomaly">Anomaly Found</span></div>';
       } else if (graphInsiders > 0) {
         h += '<div class="insider-analysis">';
-        h += '<div class="ia-label">Insider Analysis<span class="beta-tag">BETA</span></div>';
-        h += '<div class="ia-box">' + graphInsiders + ' insider' + (graphInsiders !== 1 ? 's' : '') + ' detected via graph analysis</div>';
+        h += '<div class="ia-label">Insider Cluster Analysis<span class="beta-tag">BETA</span></div>';
+        h += '<div class="ia-box">' + graphInsiders + ' insider wallet' + (graphInsiders !== 1 ? 's' : '') + ' identified via funding graphs</div>';
         h += '</div>';
-        h += '<div class="launch-insights"><span>Launch Insights<span class="beta-tag">BETA</span></span><span class="li-badge anomaly">Anomaly Found</span></div>';
+        h += '<div class="launch-insights"><span>Launch Velocity<span class="beta-tag">BETA</span></span><span class="li-badge anomaly">Anomaly Found</span></div>';
       } else if (hasScore) {
-        h += '<div class="launch-insights"><span>Launch Insights<span class="beta-tag">BETA</span></span><span class="li-badge clean">No Anomalies</span></div>';
+        h += '<div class="launch-insights"><span>Launch Velocity<span class="beta-tag">BETA</span></span><span class="li-badge clean">Clean Launch</span></div>';
       }
       h += '</div>'; // card
       h += '</div>'; // col 1
@@ -1266,29 +1581,29 @@
       /* ─── COL 2: Token Overview + Holdings & Risk ─── */
       h += '<div class="col">';
 
-      h += '<div class="card"><div class="card-head"><span class="card-head-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>Token Overview</span></div>';
+      h += '<div class="card"><div class="card-head"><span class="card-head-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg>Token Telemetry</span></div>';
       h += '<div class="kv">';
-      if (supplyAdj != null) h += '<div class="kv-row"><span class="k">Supply</span><span class="v">' + fmtS(supplyAdj) + '</span></div>';
-      if (creatorAddr) h += '<div class="kv-row"><span class="k">Creator</span><a class="v" href="https://solscan.io/account/' + creatorAddr + '" target="_blank">' + esc(tr(creatorAddr)) + '</a></div>';
+      if (supplyAdj != null) h += '<div class="kv-row"><span class="k">Total Supply</span><span class="v">' + fmtS(supplyAdj) + '</span></div>';
+      if (creatorAddr) h += '<div class="kv-row"><span class="k">Deployer</span><a class="v" href="https://solscan.io/account/' + creatorAddr + '" target="_blank">' + esc(tr(creatorAddr)) + '</a></div>';
       if (creatorAddr) {
         var cbCls = creatorSold ? 'green' : devPct > 10 ? 'red' : 'amber';
-        var cbVal = creatorSold ? 'SOLD' : devPct.toFixed(1) + '% held';
-        h += '<div class="kv-row"><span class="k">Creator Balance</span><span class="v ' + cbCls + '">' + cbVal + '</span></div>';
+        var cbVal = creatorSold ? 'SOLD OUT' : devPct.toFixed(1) + '% held';
+        h += '<div class="kv-row"><span class="k">Dev Balance</span><span class="v ' + cbCls + '">' + cbVal + '</span></div>';
       }
       if (mc != null) h += '<div class="kv-row"><span class="k">Market Cap</span><span class="v">' + fmt(mc) + '</span></div>';
-      if (holders != null) h += '<div class="kv-row"><span class="k">Holders</span><span class="v">' + fmtH(holders) + '</span></div>';
-      h += '<div class="kv-row"><span class="k">Mint Authority</span><span class="v ' + (mintRisk ? 'red' : 'green') + '">' + (mintRisk ? 'Enabled' : 'Revoked') + '</span></div>';
+      if (holders != null) h += '<div class="kv-row"><span class="k">Unique Holders</span><span class="v">' + fmtH(holders) + '</span></div>';
+      h += '<div class="kv-row"><span class="k">Mint Authority</span><span class="v ' + (mintRisk ? 'red' : 'green') + '">' + (mintRisk ? 'Enabled 🚨' : 'Revoked ✓') + '</span></div>';
       h += '</div>';
       if (creatorTokens.length > 0) {
-        h += '<div class="creator-hist">Creator has launched <strong>' + creatorTokens.length + '</strong> other token' + (creatorTokens.length !== 1 ? 's' : '') + '</div>';
+        h += '<div class="creator-hist">Deployer history: launched <strong>' + creatorTokens.length + '</strong> other coin' + (creatorTokens.length !== 1 ? 's' : '') + '</div>';
       }
       h += '</div>';
 
-      h += '<div class="card"><div class="card-head"><span class="card-head-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Holdings &amp; Risk</span></div>';
-      var lpCls = lpLocked ? '#29f19c' : lpLockedPct > 20 ? '#f5a623' : '#ff5c6c';
-      h += '<div class="bar-row"><div class="bar-top"><span class="k">LP Locked</span><span class="v" style="color:' + lpCls + '">' + lpLockedPct.toFixed(1) + '%' + (lpLocked ? ' 🔐' : '') + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100, lpLockedPct) + '%;background:' + lpCls + '"></div></div></div>';
-      var devCls = creatorSold ? '#29f19c' : devPct > 10 ? '#ff5c6c' : '#f5a623';
-      h += '<div class="bar-row"><div class="bar-top"><span class="k">Dev Holding</span><span class="v" style="color:' + devCls + '">' + devPct.toFixed(2) + '%</span></div><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100, devPct) + '%;background:' + devCls + '"></div></div></div>';
+      h += '<div class="card"><div class="card-head"><span class="card-head-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Holdings &amp; Liquidity</span></div>';
+      var lpCls = lpLocked ? 'var(--solana-green)' : lpLockedPct > 20 ? 'var(--risk-med)' : 'var(--risk-high)';
+      h += '<div class="bar-row"><div class="bar-top"><span class="k">LP Locked / Burned</span><span class="v" style="color:' + lpCls + '">' + lpLockedPct.toFixed(1) + '%' + (lpLocked ? ' 🔐' : '') + '</span></div><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100, lpLockedPct) + '%;background:' + lpCls + '"></div></div></div>';
+      var devCls = creatorSold ? 'var(--solana-green)' : devPct > 10 ? 'var(--risk-high)' : 'var(--risk-med)';
+      h += '<div class="bar-row"><div class="bar-top"><span class="k">Developer Holding</span><span class="v" style="color:' + devCls + '">' + devPct.toFixed(2) + '%</span></div><div class="bar-track"><div class="bar-fill" style="width:' + Math.min(100, devPct) + '%;background:' + devCls + '"></div></div></div>';
       h += '</div>';
 
       h += '</div>'; // col 2
@@ -1296,14 +1611,15 @@
       /* ─── COL 3: Insider Networks ─── */
       h += '<div class="col">';
       h += '<div class="card">';
-      h += '<div class="card-head"><span class="card-head-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/></svg>Insider Networks<span class="beta-tag">BETA</span></span></div>';
+      h += '<div class="card-head"><span class="card-head-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>Insider Wallet Networks<span class="beta-tag">BETA</span></span></div>';
       if (insiderNets.length === 0) {
-        h += '<div class="ok-row"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="#29f19c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No Insider Networks Detected</div>';
+        h += '<div class="ok-row"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-6" stroke="var(--solana-green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>No Insider Networks Detected</div>';
       } else {
-        h += '<table class="dt" style="min-width:0"><thead><tr><th>Name</th><th>Accs</th><th>Tokens</th></tr></thead><tbody>';
+        h += '<div class="table-responsive">';
+        h += '<table class="dt"><thead><tr><th>Cluster Name</th><th>Accounts</th><th>Holding</th></tr></thead><tbody>';
         var typeMap = { transfer: 'XFER', bundle: 'BNDL', insider: 'INSD', swap: 'SWAP' };
         insiderNets.forEach(function (net, idx) {
-          var netName = net.id || net.network || net.label || net.name || ('Network #' + (idx + 1));
+          var netName = net.id || net.network || net.label || net.name || ('Cluster #' + (idx + 1));
           var accs = net.size || net.activeAccounts || net.accounts || 0;
           var rawAmt = net.tokenAmount != null ? net.tokenAmount : (net.amount != null ? net.amount : null);
           var adjAmt = rawAmt != null ? (rawAmt / Math.pow(10, decimals)) : null;
@@ -1314,6 +1630,7 @@
           h += '<tr><td class="addr">' + esc(netName) + typeBadge + '</td><td>' + accs + '</td><td>' + toks + '</td></tr>';
         });
         h += '</tbody></table>';
+        h += '</div>';
       }
       h += '</div>';
       h += '</div>'; // col 3
@@ -1329,11 +1646,27 @@
     document.getElementById('ca').addEventListener('keydown', function (e) {
       if (e.key === 'Enter') { stopAutoRefresh(); scan(this.value.trim()); }
     });
+
+    // Sample token chips click
+    document.querySelectorAll('.sample-chip').forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var testCa = chip.getAttribute('data-testca');
+        if (testCa) {
+          document.getElementById('ca').value = testCa;
+          scan(testCa);
+        }
+      });
+    });
+
     (function () {
       var params = new URLSearchParams(window.location.search);
-      var initCA = params.get('ca');
-      if (initCA && initCA.length >= 32) { document.getElementById('ca').value = initCA; scan(initCA); }
+      var initCA = params.get('ca') || params.get('token');
+      if (initCA && initCA.length >= 32) {
+        document.getElementById('ca').value = initCA;
+        scan(initCA);
+      }
     })();
+
     // ============================================================
     // decode the coins ca so scan.html can scan the memecoin if its a rugpull to help the user
     // ============================================================
