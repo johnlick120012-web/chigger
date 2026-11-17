@@ -2,8 +2,8 @@ module.exports = async function handler(req, res) {
 
   // CORS
   const allowedOrigins = [
-    'https://www.memescope11.vercel.app',
-    'https://memescope11.vercel.app'
+    'https://www.memescope.click',
+    'https://memescope.click'
   ];
 
   const origin = req.headers.origin;
